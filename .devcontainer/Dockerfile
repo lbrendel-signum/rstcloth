@@ -18,16 +18,10 @@ ENV HISTFILE="/workspaces/rstcloth/.devcontainer/.zsh_history"
 USER vscode
 WORKDIR /workspaces/rstcloth
 
-# Install poetry
-#  TODO remove once https://github.com/windpioneers/gdal-python/issues/11 is released
 USER vscode
-ENV POETRY_HOME=/home/vscode/.poetry
-RUN curl -sSL https://install.python-poetry.org | python -
-ENV PATH "$POETRY_HOME/bin:$PATH"
-RUN poetry config virtualenvs.create false
+# Install uv
+RUN pip install uv
 
-# Install python dependencies. Note that poetry installs any root packages by default,
-# But this is not available at this stage of caching dependencies. So we do a dependency-only install here
-# to cache the dependencies, then a full poetry install post-create to install any root packages.
-COPY pyproject.toml poetry.lock ./
-RUN poetry install --extras docs --no-ansi --no-interaction --no-root
+# Install python dependencies using uv
+COPY pyproject.toml ./
+RUN uv pip install --system --group dev

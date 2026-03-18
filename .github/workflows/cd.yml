@@ -17,21 +17,12 @@ jobs:
         uses: actions/checkout@v3
 
       # No point testing this immediately before doing it. TODO refactor to CI.
-      # - name: Test package is publishable with PyPI test server
-      #   uses: JRubics/poetry-publish@v1.16
-      #   with:
-      #     python_version: "3.9"
-      #     pypi_token: ${{ secrets.TEST_PYPI_TOKEN }}
-      #     repository_name: "testpypi"
-      #     repository_url: "https://test.pypi.org/legacy/"
-
       - name: Publish latest package to PyPI
-        uses: JRubics/poetry-publish@v1.16
-        with:
-          python_version: "3.9"
-          poetry_version: "==1.4.2" # (PIP version specifier syntax)
-          pypi_token: ${{ secrets.PYPI_TOKEN }}
-          ignore_dev_requirements: "yes"
+        run: |
+          pip install uv twine
+          uv pip install --system
+          python -m build
+          twine upload dist/* --skip-existing --username __token__ --password ${{ secrets.PYPI_TOKEN }}
 
   release:
     # This job will only run if the PR has been merged (and not closed without merging).
@@ -42,12 +33,9 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v3
 
-      - name: Install poetry
-        run: pip install poetry
-
       - name: Get package version
         id: version
-        run: echo "::set-output name=package_version::$(poetry version -s)"
+        run: echo "::set-output name=package_version::$(python setup.py --version)"
 
       - name: Create release
         uses: actions/create-release@v1

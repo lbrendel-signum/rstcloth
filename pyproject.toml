@@ -3,7 +3,7 @@ name = "rstcloth"
 version = "0.6.0"
 description = "A simple Python API for generating RestructuredText."
 authors = [{ name = "Tom Clark" }]
-requires-python = ">=3.7,<4"
+requires-python = ">=3.9,<4"
 readme = "README.md"
 license = "MIT"
 keywords = [
@@ -18,11 +18,12 @@ classifiers = [
     "Development Status :: 4 - Beta",
     "Intended Audience :: Developers",
     "License :: OSI Approved :: MIT License",
-    "Programming Language :: Python :: 3.8",
     "Programming Language :: Python :: 3.9",
     "Programming Language :: Python :: 3.10",
     "Programming Language :: Python :: 3.11",
     "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Programming Language :: Python :: 3.14",
     "Operating System :: OS Independent",
     "Natural Language :: English",
     "Topic :: Documentation :: Sphinx",
@@ -31,10 +32,12 @@ classifiers = [
     "Topic :: Text Processing",
     "Topic :: Utilities",
     "Programming Language :: Python :: 3",
-    "Programming Language :: Python :: 3.7",
-    "Programming Language :: Python :: 3.13",
-    "Programming Language :: Python :: 3.14",
 ]
+[tool.ruff]
+line-length = 120
+target-version = "py39"
+select = ["E", "F", "W", "C", "B", "I"]
+exclude = [".git", ".tox", "dist", "docs/source/_build", "docs/html/", "docs/doctrees/", "rstcloth.egg-info"]
 dependencies = [
     "Pygments>=2.12.0,<3",
     "PyYAML>=5,<7",
