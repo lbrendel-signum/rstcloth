@@ -1,5 +1,6 @@
 import io
 import unittest
+
 import pytest
 
 from rstcloth import RstCloth
@@ -36,27 +37,27 @@ class TestRstCloth(unittest.TestCase):
 
     def test_directive_fields(self):
         self.r.directive("test", fields=[("a", "b")])
-        self.assertEqual(self.r.data, ".. test::\n" "   :a: b\n")
+        self.assertEqual(self.r.data, ".. test::\n   :a: b\n")
 
     def test_directive_fields_with_arg(self):
         self.r.directive("test", arg="what", fields=[("a", "b")])
-        self.assertEqual(self.r.data, ".. test:: what\n" "   :a: b\n")
+        self.assertEqual(self.r.data, ".. test:: what\n   :a: b\n")
 
     def test_directive_fields_multiple(self):
         self.r.directive("test", fields=[("a", "b"), ("c", "d")])
-        self.assertEqual(self.r.data, ".. test::\n" "   :a: b\n" "   :c: d\n")
+        self.assertEqual(self.r.data, ".. test::\n   :a: b\n   :c: d\n")
 
     def test_directive_fields_multiple_arg(self):
         self.r.directive("test", arg="new", fields=[("a", "b"), ("c", "d")])
-        self.assertEqual(self.r.data, ".. test:: new\n" "   :a: b\n" "   :c: d\n")
+        self.assertEqual(self.r.data, ".. test:: new\n   :a: b\n   :c: d\n")
 
     def test_directive_content(self):
         self.r.directive("test", content="string")
-        self.assertEqual(self.r.data, ".. test::\n" "\n" "   string\n" "\n")
+        self.assertEqual(self.r.data, ".. test::\n\n   string\n\n")
 
     def test_directive_with_multiline_content(self):
         self.r.directive("test", content=["string", "second"])
-        self.assertEqual(self.r.data, ".. test::\n" "\n" "   string\n" "   second\n" "\n")
+        self.assertEqual(self.r.data, ".. test::\n\n   string\n   second\n\n")
 
     def test_directive_simple_indent(self):
         self.r.directive("test", indent=3)
@@ -72,58 +73,50 @@ class TestRstCloth(unittest.TestCase):
 
     def test_directive_fields_indent(self):
         self.r.directive("test", fields=[("a", "b")], indent=3)
-        self.assertEqual(self.r.data, "   .. test::\n" "      :a: b\n")
+        self.assertEqual(self.r.data, "   .. test::\n      :a: b\n")
 
     def test_directive_fields_with_arg_indent(self):
         self.r.directive("test", arg="what", fields=[("a", "b")], indent=3)
-        self.assertEqual(self.r.data, "   .. test:: what\n" "      :a: b\n")
+        self.assertEqual(self.r.data, "   .. test:: what\n      :a: b\n")
 
     def test_directive_fields_multiple_indent(self):
         self.r.directive("test", indent=3, fields=[("a", "b"), ("c", "d")])
-        self.assertEqual(self.r.data, "   .. test::\n" "      :a: b\n" "      :c: d\n")
+        self.assertEqual(self.r.data, "   .. test::\n      :a: b\n      :c: d\n")
 
     def test_directive_fields_multiple_arg_indent(self):
         self.r.directive("test", arg="new", indent=3, fields=[("a", "b"), ("c", "d")])
-        self.assertEqual(self.r.data, "   .. test:: new\n" "      :a: b\n" "      :c: d\n")
+        self.assertEqual(self.r.data, "   .. test:: new\n      :a: b\n      :c: d\n")
 
     def test_directive_content_indent(self):
         self.r.directive("test", content="string", indent=3)
-        self.assertEqual(self.r.data, "   .. test::\n" "\n" "      string\n" "\n")
+        self.assertEqual(self.r.data, "   .. test::\n\n      string\n\n")
 
     def test_directive_with_multiline_content_indent(self):
         self.r.directive("test", indent=3, content=["string", "second"])
-        self.assertEqual(self.r.data, "   .. test::\n" "\n" "      string\n" "      second\n" "\n")
+        self.assertEqual(self.r.data, "   .. test::\n\n      string\n      second\n\n")
 
     def test_directive_with_long_argument_indent(self):
         argument = " ".join(["spam"] * 20)
-        expected = "   .. test:: " + " ".join(["spam"] * 12) + "\n" "      " + " ".join(["spam"] * 8) + "\n"
+        expected = "   .. test:: " + " ".join(["spam"] * 12) + "\n      " + " ".join(["spam"] * 8) + "\n"
         self.r.directive("test", arg=argument, indent=3)
         self.assertEqual(self.r.data, expected)
 
     def test_directive_with_long_field_indent(self):
         content = " ".join(["spam"] * 20)
         expected = (
-            "   .. test::\n"
-            "      :name: " + " ".join(["spam"] * 12) + "\n"
-            "         " + " ".join(["spam"] * 8) + "\n"
+            "   .. test::\n      :name: " + " ".join(["spam"] * 12) + "\n         " + " ".join(["spam"] * 8) + "\n"
         )
         self.r.directive("test", indent=3, fields=[("name", content)])
         self.assertEqual(self.r.data, expected)
 
     def test_directive_with_long_content_indent(self):
         content = " ".join(["test"] * 20)
-        expected = (
-            "   .. test::\n"
-            "\n"
-            "      " + " ".join(["test"] * 13) + "\n"
-            "      " + " ".join(["test"] * 7) + "\n"
-            "\n"
-        )
+        expected = "   .. test::\n\n      " + " ".join(["test"] * 13) + "\n      " + " ".join(["test"] * 7) + "\n\n"
         self.r.directive("test", indent=3, content=content)
         self.assertEqual(self.r.data, expected)
 
     def test_directive_very_long_with_argument(self):
-        given = "my very long directive with spam spam spam spam ham bacon " "and eggs"
+        given = "my very long directive with spam spam spam spam ham bacon and eggs"
         expected = "   .. {given}::\n      spam\n".format(given=given)
         self.r.directive(given, arg="spam", indent=3)
         self.assertEqual(self.r.data, expected)
@@ -182,11 +175,11 @@ class TestRstCloth(unittest.TestCase):
 
     def test_codeblock_simple(self):
         self.r.codeblock("ls -lha")
-        self.assertEqual(self.r.data, "::\n" "   ls -lha\n")
+        self.assertEqual(self.r.data, "::\n   ls -lha\n")
 
     def test_codeblock_with_language(self):
         self.r.codeblock("ls -lha", language="shell")
-        self.assertEqual(self.r.data, ".. code-block:: shell\n" "\n" "   ls -lha\n")
+        self.assertEqual(self.r.data, ".. code-block:: shell\n\n   ls -lha\n")
 
     def test_footnote(self):
         self.r.footnote("footsnotes", "text of the note")
@@ -204,55 +197,55 @@ class TestRstCloth(unittest.TestCase):
 
     def test_definition(self):
         self.r.definition("defitem", "this is def text")
-        self.assertEqual(self.r.data, "defitem\n" "   this is def text\n")
+        self.assertEqual(self.r.data, "defitem\n   this is def text\n")
 
     def test_definition_bold(self):
         self.r.definition("defitem", "this is def text", bold=True)
-        self.assertEqual(self.r.data, "**defitem**\n" "   this is def text\n")
+        self.assertEqual(self.r.data, "**defitem**\n   this is def text\n")
 
     def test_definition_with_indent(self):
         self.r.definition("defitem", "this is def text", indent=3)
-        self.assertEqual(self.r.data, "   defitem\n" "      this is def text\n")
+        self.assertEqual(self.r.data, "   defitem\n      this is def text\n")
 
     def test_title_default(self):
         self.r.title("test text")
-        self.assertEqual(self.r.data, "=========\n" "test text\n" "=========\n")
+        self.assertEqual(self.r.data, "=========\ntest text\n=========\n")
 
     def test_title_alt(self):
         self.r.title("test text", char="-")
-        self.assertEqual(self.r.data, "---------\n" "test text\n" "---------\n")
+        self.assertEqual(self.r.data, "---------\ntest text\n---------\n")
 
     def test_heading_one(self):
         self.r.heading("test heading", char="-", indent=0)
-        self.assertEqual(self.r.data, "test heading\n" "------------\n")
+        self.assertEqual(self.r.data, "test heading\n------------\n")
 
     def test_heading_two(self):
         self.r.heading("test heading", char="^", indent=0)
-        self.assertEqual(self.r.data, "test heading\n" "^^^^^^^^^^^^\n")
+        self.assertEqual(self.r.data, "test heading\n^^^^^^^^^^^^\n")
 
     def test_h1(self):
         self.r.h1("test")
-        self.assertEqual(self.r.data, "test\n" "====\n")
+        self.assertEqual(self.r.data, "test\n====\n")
 
     def test_h2(self):
         self.r.h2("test")
-        self.assertEqual(self.r.data, "test\n" "----\n")
+        self.assertEqual(self.r.data, "test\n----\n")
 
     def test_h3(self):
         self.r.h3("test")
-        self.assertEqual(self.r.data, "test\n" "~~~~\n")
+        self.assertEqual(self.r.data, "test\n~~~~\n")
 
     def test_h4(self):
         self.r.h4("test")
-        self.assertEqual(self.r.data, "test\n" "++++\n")
+        self.assertEqual(self.r.data, "test\n++++\n")
 
     def test_h5(self):
         self.r.h5("test")
-        self.assertEqual(self.r.data, "test\n" "^^^^\n")
+        self.assertEqual(self.r.data, "test\n^^^^\n")
 
     def test_h6(self):
         self.r.h6("test")
-        self.assertEqual(self.r.data, "test\n" ";;;;\n")
+        self.assertEqual(self.r.data, "test\n;;;;\n")
 
     def test_replacement(self):
         self.r.replacement("foo", "replace-with-bar")
@@ -326,7 +319,7 @@ class TestRstCloth(unittest.TestCase):
 
     def test_field_simple_long_long(self):
         self.r.field("fname", "v" * 65)
-        self.assertEqual(self.r.data, ":fname:\n" "   " + "v" * 65 + "\n")
+        self.assertEqual(self.r.data, ":fname:\n   " + "v" * 65 + "\n")
 
     def test_field_indent_simple(self):
         self.r.field("fname", "fvalue", indent=3)
@@ -342,7 +335,7 @@ class TestRstCloth(unittest.TestCase):
 
     def test_field_indent_simple_long_long(self):
         self.r.field("fname", "v" * 62, indent=3)
-        self.assertEqual(self.r.data, "   :fname:\n" "      " + "v" * 62 + "\n")
+        self.assertEqual(self.r.data, "   :fname:\n      " + "v" * 62 + "\n")
 
     def test_field_wrap_simple(self):
         expected = (
@@ -382,7 +375,7 @@ class TestRstCloth(unittest.TestCase):
         )
 
     def test_field_very_long_with_value(self):
-        given = "my very long field with spam spam spam spam spam ham bacon " "and eggs"
+        given = "my very long field with spam spam spam spam spam ham bacon and eggs"
         expected = "   :{given}:\n      spam\n".format(given=given)
         self.r.field(name=given, value="spam", indent=3)
         self.assertEqual(self.r.data, expected)
@@ -453,7 +446,7 @@ class TestRstCloth(unittest.TestCase):
 
     def test_warning_box(self):
         self.r.warning(arg=None, content="Danger!")
-        expected = ".. warning::\n" "\n" "   Danger!\n" "\n"
+        expected = ".. warning::\n\n   Danger!\n\n"
         self.assertEqual(self.r.data, expected)
 
     def test_version(self):
@@ -463,22 +456,22 @@ class TestRstCloth(unittest.TestCase):
 
     def test_page_break(self):
         self.r.page_break()
-        expected = ".. raw:: pdf\n" "\n" "   PageBreak\n" "\n"
+        expected = ".. raw:: pdf\n\n   PageBreak\n\n"
         self.assertEqual(self.r.data, expected)
 
     def test_page_break_template(self):
         self.r.page_break(template="spam")
-        expected = ".. raw:: pdf\n" "\n" "   PageBreak spam\n" "\n"
+        expected = ".. raw:: pdf\n\n   PageBreak spam\n\n"
         self.assertEqual(self.r.data, expected)
 
     def test_frame_break(self):
         self.r.frame_break(heights=100)
-        expected = ".. raw:: pdf\n" "\n" "   FrameBreak 100\n" "\n"
+        expected = ".. raw:: pdf\n\n   FrameBreak 100\n\n"
         self.assertEqual(self.r.data, expected)
 
     def test_spacer(self):
         self.r.spacer(horizontal=0, vertical=30)
-        expected = ".. raw:: pdf\n" "\n" "   Spacer 0 30\n" "\n"
+        expected = ".. raw:: pdf\n\n   Spacer 0 30\n\n"
         self.assertEqual(self.r.data, expected)
 
     def test_table_of_contents(self):
@@ -488,7 +481,7 @@ class TestRstCloth(unittest.TestCase):
 
     def test_table_of_contents_options(self):
         self.r.table_of_contents(name="Table of Contents", depth=2, backlinks="entry")
-        expected = ".. contents:: Table of Contents\n" "   :depth: 2\n" "   :backlinks: entry\n"
+        expected = ".. contents:: Table of Contents\n   :depth: 2\n   :backlinks: entry\n"
         self.assertEqual(self.r.data, expected)
 
     def test_transition_marker(self):
@@ -503,21 +496,21 @@ class TestTable(unittest.TestCase):
     def test_header_1_body_0(self):
         r = RstCloth(stream=io.StringIO())
         r.table(header=["span"], data=None)
-        expected = "\n+--------+\n" "| span   |\n" "+========+\n" "+--------+\n\n"
+        expected = "\n+--------+\n| span   |\n+========+\n+--------+\n\n"
         given = r.data
         self.assertEqual(expected, given)
 
     def test_header_1_body_1(self):
         r = RstCloth(stream=io.StringIO())
         r.table(header=["span"], data=[[1]])
-        expected = "\n+--------+\n" "| span   |\n" "+========+\n" "| 1      |\n" "+--------+\n\n"
+        expected = "\n+--------+\n| span   |\n+========+\n| 1      |\n+--------+\n\n"
         given = r.data
         self.assertEqual(expected, given)
 
     def test_header_2_body_0(self):
         r = RstCloth(stream=io.StringIO())
         r.table(header=["span", "ham"], data=None)
-        expected = "\n+--------+-------+\n" "| span   | ham   |\n" "+========+=======+\n" "+--------+-------+\n\n"
+        expected = "\n+--------+-------+\n| span   | ham   |\n+========+=======+\n+--------+-------+\n\n"
         given = r.data
         self.assertEqual(expected, given)
 
@@ -525,11 +518,7 @@ class TestTable(unittest.TestCase):
         r = RstCloth(stream=io.StringIO())
         r.table(header=["span", "ham"], data=[[1, 2]])
         expected = (
-            "\n+--------+-------+\n"
-            "| span   | ham   |\n"
-            "+========+=======+\n"
-            "| 1      | 2     |\n"
-            "+--------+-------+\n\n"
+            "\n+--------+-------+\n| span   | ham   |\n+========+=======+\n| 1      | 2     |\n+--------+-------+\n\n"
         )
         given = r.data
         self.assertEqual(expected, given)
@@ -571,16 +560,7 @@ class TestTable(unittest.TestCase):
         headers = ["span", "ham"]
         data = [["1", "2"], ["3", "4"]]
         expected = (
-            ".. list-table::\n"
-            "   :header-rows: 1\n"
-            "\n"
-            "   * - span\n"
-            "     - ham\n"
-            "   * - 1\n"
-            "     - 2\n"
-            "   * - 3\n"
-            "     - 4\n"
-            "\n"
+            ".. list-table::\n   :header-rows: 1\n\n   * - span\n     - ham\n   * - 1\n     - 2\n   * - 3\n     - 4\n\n"
         )
 
         r.table_list(headers, data)
