@@ -7,11 +7,11 @@ from tabulate import tabulate
 
 from rstcloth.utils import first_whitespace_position
 
-t_content = typing.Union[str, typing.List[str]]
-t_fields = typing.Iterable[typing.Tuple[str, str]]
-t_optional_2d_array = typing.Optional[typing.List[typing.List]]
+t_content = typing.Union[str, list[str]]
+t_fields = typing.Iterable[tuple[str, str]]
+t_optional_2d_array = typing.Optional[list[list]]
 t_width = typing.Union[int, str]
-t_widths = typing.Union[typing.List[int], str]
+t_widths = typing.Union[list[int], str]
 
 
 def _indent(content: t_content, indent: int) -> str:
@@ -91,7 +91,7 @@ class RstCloth:
             # subtract one because every item gets one \n for free.
             self._add("\n" * (count - 1))
 
-    def table(self, header: typing.List, data: t_optional_2d_array, indent=0) -> None:
+    def table(self, header: list, data: t_optional_2d_array, indent=0) -> None:
         """Constructs grid table.
 
         :param header: a list of header values (strings), to use for the table
@@ -102,7 +102,7 @@ class RstCloth:
         t = tabulate(tabular_data=data, headers=header, tablefmt="grid", disable_numparse=True)
         self._add("\n" + _indent(t, indent) + "\n")
 
-    def simple_table(self, header: typing.List, data: t_optional_2d_array, indent=0) -> None:
+    def simple_table(self, header: list, data: t_optional_2d_array, indent=0) -> None:
         """Constructs a simple grid table.
 
         :param header: a list of header values (strings), to use for the table
@@ -156,7 +156,7 @@ class RstCloth:
         self.newline()
 
     def directive(
-        self, name: str, arg: str = None, fields: t_fields = None, content: t_content = None, indent: int = 0
+        self, name: str, arg: typing.Optional[str] = None, fields: t_fields = None, content: t_content = None, indent: int = 0
     ) -> None:
         """Constructs reStructuredText directive.
 
@@ -197,7 +197,7 @@ class RstCloth:
             self.newline()
 
     @classmethod
-    def role(cls, name: t_content, value: str, text: str = None) -> str:
+    def role(cls, name: t_content, value: str, text: typing.Optional[str] = None) -> str:
         """Returns role with optional hyperlink.
 
         :param name: the name of the role
@@ -269,7 +269,7 @@ class RstCloth:
         output = f".. |{name}| replace:: {value}"
         self._add(_indent(output, indent))
 
-    def codeblock(self, content: t_content, indent: int = 0, language: str = None) -> None:
+    def codeblock(self, content: t_content, indent: int = 0, language: typing.Optional[str] = None) -> None:
         """Constructs literal block.
 
         :param content: the text to write into this element
@@ -410,15 +410,12 @@ class RstCloth:
     version = functools.partialmethod(field, name="Version")
 
     # raw directives
-    def page_break(self, template: str = None) -> None:
+    def page_break(self, template: typing.Optional[str] = None) -> None:
         """Constructs page break.
 
         :param template: name of the next page template
         """
-        if template is None:
-            content = "PageBreak"
-        else:
-            content = f"PageBreak {template}"
+        content = "PageBreak" if template is None else f"PageBreak {template}"
         self.directive(name="raw", arg="pdf", content=content)
 
     def frame_break(self, heights: int) -> None:
@@ -440,7 +437,7 @@ class RstCloth:
             content=f"Spacer {horizontal} {vertical}",
         )
 
-    def table_of_contents(self, name: str = None, depth: int = None, backlinks: str = None) -> None:
+    def table_of_contents(self, name: typing.Optional[str] = None, depth: typing.Optional[int] = None, backlinks: typing.Optional[str] = None) -> None:
         """Constructs table of contents.
 
         :param name: table of contents alternative title
@@ -458,6 +455,5 @@ class RstCloth:
         self.directive(name="contents", arg=name, fields=options)
 
     def transition_marker(self) -> None:
-        """Constructs transition marker.
-        """
+        """Constructs transition marker."""
         self._add("\n---------\n")
