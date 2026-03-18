@@ -15,8 +15,7 @@ t_widths = typing.Union[typing.List[int], str]
 
 
 def _indent(content: t_content, indent: int) -> str:
-    """
-    Prepends each nonempty line in content parameter with spaces.
+    """Prepends each nonempty line in content parameter with spaces.
 
     :param content: text to be indented
     :param indent: number of spaces to indent this element
@@ -31,8 +30,7 @@ def _indent(content: t_content, indent: int) -> str:
 
 
 class RstCloth:
-    """
-    RstCloth is the base class to create a ReStructuredText document
+    """RstCloth is the base class to create a ReStructuredText document
     programmatically.
 
     :param stream: output stream for writing ReStructuredText content
@@ -45,8 +43,7 @@ class RstCloth:
         self._line_width = line_width
 
     def fill(self, text: str, initial_indent: int = 0, subsequent_indent: int = 0) -> str:
-        """
-        Breaks text parameter into separate lines. Each line is indented
+        """Breaks text parameter into separate lines. Each line is indented
         accordingly to initial_indent and subsequent_indent parameters.
 
         :param text: input string to be wrapped and indented
@@ -65,12 +62,10 @@ class RstCloth:
         )
 
     def _add(self, content: t_content) -> None:
-        """
-        Places content into output stream.
+        """Places content into output stream.
 
         :param content: the text to write into this element
         """
-
         if isinstance(content, list):
             self._stream.write("\n".join(content) + "\n")
         else:
@@ -78,8 +73,7 @@ class RstCloth:
 
     @property
     def data(self) -> str:
-        """
-        Returns ReStructuredText document content as a string.
+        """Returns ReStructuredText document content as a string.
 
         :return: the content of output stream
         """
@@ -87,8 +81,7 @@ class RstCloth:
         return self._stream.read()
 
     def newline(self, count: int = 1) -> None:
-        """
-        Places a newline(s) into ReStructuredText document.
+        """Places a newline(s) into ReStructuredText document.
 
         :param count: the number of newlines to add
         """
@@ -99,28 +92,24 @@ class RstCloth:
             self._add("\n" * (count - 1))
 
     def table(self, header: typing.List, data: t_optional_2d_array, indent=0) -> None:
-        """
-        Constructs grid table.
+        """Constructs grid table.
 
         :param header: a list of header values (strings), to use for the table
         :param data: a list of lists of row data (same length as the header
             list each)
         :param indent: number of spaces to indent this element
         """
-
         t = tabulate(tabular_data=data, headers=header, tablefmt="grid", disable_numparse=True)
         self._add("\n" + _indent(t, indent) + "\n")
 
     def simple_table(self, header: typing.List, data: t_optional_2d_array, indent=0) -> None:
-        """
-        Constructs a simple grid table.
+        """Constructs a simple grid table.
 
         :param header: a list of header values (strings), to use for the table
         :param data: a list of lists of row data (same length as the header
             list each)
         :param indent: number of spaces to indent this element
         """
-
         t = tabulate(tabular_data=data, headers=header, tablefmt="rst", disable_numparse=True)
         self._add("\n" + _indent(t, indent) + "\n")
 
@@ -132,8 +121,7 @@ class RstCloth:
         width: t_width = None,
         indent: int = 0,
     ) -> None:
-        """
-        Constructs list table.
+        """Constructs list table.
 
         :param headers: a list of header values (strings), to use for the table
         :param data: a list of lists of row data (same length as the header
@@ -170,8 +158,7 @@ class RstCloth:
     def directive(
         self, name: str, arg: str = None, fields: t_fields = None, content: t_content = None, indent: int = 0
     ) -> None:
-        """
-        Constructs reStructuredText directive.
+        """Constructs reStructuredText directive.
 
         :param name: the directive itself to use
         :param arg: the argument to pass into the directive
@@ -180,7 +167,7 @@ class RstCloth:
         :param indent: number of spaces to indent this element
         """
         if arg is None:
-            marker = ".. {type}::".format(type=name)
+            marker = f".. {name}::"
             self._add(_indent(marker, indent))
         else:
             first_whitespace = first_whitespace_position(arg)
@@ -189,11 +176,11 @@ class RstCloth:
             # the directive in half then it is better to exceed the line width
             # limitation.
             if len(name) + first_whitespace + indent + 6 > self._line_width:
-                marker = ".. {type}::".format(type=name)
+                marker = f".. {name}::"
                 self._add(_indent(marker, indent))
                 self.content(arg, indent=indent + 3)
             else:
-                marker = ".. {type}:: {argument}".format(type=name, argument=arg)
+                marker = f".. {name}:: {arg}"
                 result = self.fill(marker, initial_indent=indent, subsequent_indent=indent + 3)
                 self._add(result)
 
@@ -211,90 +198,79 @@ class RstCloth:
 
     @classmethod
     def role(cls, name: t_content, value: str, text: str = None) -> str:
-        """
-        Returns role with optional hyperlink.
+        """Returns role with optional hyperlink.
 
         :param name: the name of the role
         :param value: the value of the role
         :param text: text after the role
         :return: role element
         """
-
         if isinstance(name, list):
             name = ":".join(name)
 
         if text is None:
-            return ":{0}:`{1}`".format(name, value)
-        else:
-            link = cls.inline_link(text=text, link=value)
-            return ":{0}:{1}".format(name, link)
+            return f":{name}:`{value}`"
+        link = cls.inline_link(text=text, link=value)
+        return f":{name}:{link}"
 
     @staticmethod
     def bold(string: str) -> str:
-        """
-        Returns strongly emphasised (boldface) text.
+        """Returns strongly emphasised (boldface) text.
 
         :param string: the text to write into this element
         :return: bolded text
         """
-        return "**{0}**".format(string)
+        return f"**{string}**"
 
     @staticmethod
     def emph(string: str) -> str:
-        """
-        Returns emphasised (italics) text.
+        """Returns emphasised (italics) text.
 
         :param string: the text to write into this element
         :return: emphasised text
         """
-        return "*{0}*".format(string)
+        return f"*{string}*"
 
     @staticmethod
     def pre(string: str) -> str:
-        """
-        Returns inline literals.
+        """Returns inline literals.
 
         :param string: the text to write into this element
         :return: inline literals
         """
-        return "``{0}``".format(string)
+        return f"``{string}``"
 
     @staticmethod
     def inline_link(text: str, link: str) -> str:
-        """
-        Returns hyperlink reference.
+        """Returns hyperlink reference.
 
         :param text: the printed value of the link
         :param link: the url the link should goto
         :return: hyperlink reference
         """
-        return "`{0} <{1}>`_".format(text, link)
+        return f"`{text} <{link}>`_"
 
     @staticmethod
     def footnote_ref(name: str) -> str:
-        """
-        Returns footnote reference.
+        """Returns footnote reference.
 
         :param name: the text to write into this element
         :return: footnote reference
         """
-        return "[#{0}]_".format(name)
+        return f"[#{name}]_"
 
     def replacement(self, name: str, value: str, indent: int = 0) -> None:
-        """
-        Constructs replacement directive.
+        """Constructs replacement directive.
 
         :param name: the name of the replacement
         :param value: the value for the replacement
         :param indent: number of spaces to indent this element
         """
-
-        output = ".. |{0}| replace:: {1}".format(name, value)
+        output = f".. |{name}| replace:: {value}"
         self._add(_indent(output, indent))
 
     def codeblock(self, content: t_content, indent: int = 0, language: str = None) -> None:
-        """
-        Constructs literal block.
+        """Constructs literal block.
 
         :param content: the text to write into this element
         :param indent: number of spaces to indent this element
@@ -310,18 +286,16 @@ class RstCloth:
         self._add(_indent(content, indent + 3))
 
     def footnote(self, ref: str, text: str, indent: int = 0) -> None:
-        """
-        Constructs footnote directive.
+        """Constructs footnote directive.
 
         :param ref: the reference value
         :param text: the text to write into this element
         :param indent: number of spaces to indent this element
         """
-        self._add(self.fill(".. [#{0}] {1}".format(ref, text), indent, indent + 3))
+        self._add(self.fill(f".. [#{ref}] {text}", indent, indent + 3))
 
     def definition(self, name: str, text: str, indent: int = 0, bold: bool = False) -> None:
-        """
-        Constructs definition list item.
+        """Constructs definition list item.
 
         :param name: the name of the definition
         :param text: the text to write into this element
@@ -335,14 +309,12 @@ class RstCloth:
         self._add(self.fill(text, indent + 3, indent + 3))
 
     def li(self, content: t_content, bullet: str = "-", indent: int = 0) -> None:
-        """
-        Constructs bullet list item.
+        """Constructs bullet list item.
 
         :param content: the text to write into this element
         :param bullet: the character of the bullet
         :param indent: number of spaces to indent this element
         """
-
         bullet += " "
         hanging_indent_len = indent + len(bullet)
 
@@ -353,8 +325,7 @@ class RstCloth:
             self._add(self.fill(bullet + content, indent, hanging_indent_len))
 
     def field(self, name: str, value: str, indent: int = 0) -> None:
-        """
-        Constructs a field.
+        """Constructs a field.
 
         :param name: the name of the field
         :param value: the value of the field
@@ -362,27 +333,25 @@ class RstCloth:
         """
         first_whitespace = first_whitespace_position(value)
         if len(name) + first_whitespace + indent + 3 > self._line_width:
-            marker = ":{name}:".format(name=name)
+            marker = f":{name}:"
             self._add(_indent(marker, indent))
             self.content(value, indent=indent + 3)
         else:
-            marker = ":{name}: {value}".format(name=name, value=value)
+            marker = f":{name}: {value}"
             result = self.fill(marker, initial_indent=indent, subsequent_indent=indent + 3)
             self._add(result)
 
     def ref_target(self, name: str, indent: int = 0) -> None:
-        """
-        Constructs hyperlink reference target.
+        """Constructs hyperlink reference target.
 
         :param name: the name of the reference target
         :param indent: number of spaces to indent this element
         """
-        o = ".. _{0}:".format(name)
+        o = f".. _{name}:"
         self._add(_indent(o, indent))
 
     def content(self, content: t_content, indent: int = 0) -> None:
-        """
-        Constructs paragraph's content.
+        """Constructs paragraph's content.
 
         :param content: the text to write into this element
         :param indent: number of spaces to indent this element
@@ -392,8 +361,7 @@ class RstCloth:
         self._add(self.fill(content, indent, indent))
 
     def heading(self, text: str, char: str, overline: bool = False, indent: int = 0) -> None:
-        """
-        Constructs section title.
+        """Constructs section title.
 
         :param text: the text to write into this element
         :param char: the character to line the heading with
@@ -443,28 +411,25 @@ class RstCloth:
 
     # raw directives
     def page_break(self, template: str = None) -> None:
-        """
-        Constructs page break.
+        """Constructs page break.
 
         :param template: name of the next page template
         """
         if template is None:
             content = "PageBreak"
         else:
-            content = "PageBreak {template}".format(template=template)
+            content = f"PageBreak {template}"
         self.directive(name="raw", arg="pdf", content=content)
 
     def frame_break(self, heights: int) -> None:
-        """
-        Constructs frame break.
+        """Constructs frame break.
 
         :param heights: height in points
         """
-        self.directive(name="raw", arg="pdf", content="FrameBreak {0}".format(heights))
+        self.directive(name="raw", arg="pdf", content=f"FrameBreak {heights}")
 
     def spacer(self, horizontal: int, vertical: int) -> None:
-        """
-        Constructs a spacer.
+        """Constructs a spacer.
 
         :param horizontal: horizontal size in points
         :param vertical: vertical size in points
@@ -472,12 +437,11 @@ class RstCloth:
         self.directive(
             name="raw",
             arg="pdf",
-            content="Spacer {horizontal} {vertical}".format(horizontal=horizontal, vertical=vertical),
+            content=f"Spacer {horizontal} {vertical}",
         )
 
     def table_of_contents(self, name: str = None, depth: int = None, backlinks: str = None) -> None:
-        """
-        Constructs table of contents.
+        """Constructs table of contents.
 
         :param name: table of contents alternative title
         :param depth: the number of section levels that are collected
@@ -494,7 +458,6 @@ class RstCloth:
         self.directive(name="contents", arg=name, fields=options)
 
     def transition_marker(self) -> None:
-        """
-        Constructs transition marker.
+        """Constructs transition marker.
         """
         self._add("\n---------\n")

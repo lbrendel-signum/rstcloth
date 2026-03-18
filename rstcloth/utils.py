@@ -1,6 +1,5 @@
 def first_whitespace_position(string: str) -> int:
-    """
-    Finds the first whitespace and return it's position. If there is no
+    """Finds the first whitespace and return it's position. If there is no
     whitespaces return string's length.
 
     :param string: string to look for whitespaces in
