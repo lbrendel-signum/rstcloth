@@ -71,7 +71,21 @@ requires = ["uv_build>=0.10.4,<0.11.0"]
 build-backend = "uv_build"
 
 [tool.ruff]
-line-length = 120
-target-version = "py39"
-select = ["E", "F", "W", "C", "B", "I"]
-exclude = [".git", ".tox", "dist", "docs/source/_build", "docs/html/", "docs/doctrees/", "rstcloth.egg-info"]
+line-length = 100
+lint.select = ["ALL"]
+lint.ignore = [
+    "D203",
+    "D213",
+    "FA100",
+    "FA102",
+    "TRY003",
+    "D400",
+    "D415",
+    "RUF012",
+    "B019",
+    "TD003",
+    "G004",
+    "EM101",
+    "EM102",
+    "COM812",
+]
