@@ -36,11 +36,24 @@ Check out the repo and use the remote `.devcontainer` to start developing, with 
 
 ### In other IDEs
 
-Use `poetry --extras docs` to install the project and get started. You also You need to install pre-commit to get the hooks working. Do:
+To install the project and get started, use uv:
+
+```
+pip install uv
+uv pip install --system --group dev
+```
+
+You also need to install pre-commit to get the hooks working:
 
 ```
 pip install pre-commit
 pre-commit install && pre-commit install -t commit-msg
+```
+
+Ruff is used for linting. Run it with:
+
+```
+ruff .
 ```
 
 Once that's done, each time you make a commit, a wide range of checks are made and the project file formats are applied.
